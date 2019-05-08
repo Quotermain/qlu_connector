@@ -1,4 +1,4 @@
-function number_of_stops(seccode)
+function quantity_in_stop(seccode)
 	local t=nil
 	local stop_number=nil
 	for i=0,getNumberOf("stop_orders")-1 do
@@ -22,7 +22,7 @@ function id_of_stop_to_kill(seccode)
     return kill
 end
 
-function kill_stop(seccode, quantity, stop_order_key)
+function killstop_trans(seccode, quantity, stop_order_key)
     local Transaction = {
         ACCOUNT="L01-00000F00",
         CLIENT_CODE="OPEN51085",
@@ -38,7 +38,7 @@ function kill_stop(seccode, quantity, stop_order_key)
 	return Transaction
 end
 
-function send_stop(operation, stopprice, quantity, price, stopprice2, seccode, price_step)
+function stop_trans(operation, stopprice, quantity, price, stopprice2, seccode, price_step)
     local Transaction = {
         ACCOUNT="L01-00000F00",
         CLIENT_CODE="OPEN51085",
@@ -67,18 +67,18 @@ end
 
 --Надо одну стоп заявку. Посылает две.
 function OnOrder(order)
-	if (number_of_stops('HYDR')==0 or number_of_stops('HYDR')==nil) then
+	if (quantity_in_stop('HYDR')==0 or quantity_in_stop('HYDR')==nil) then
 		if bit.band(order.flags,1)==0 and bit.band(order.flags,2)==0 then
 			if bit.band(order.flags,4)>1 then
 				sendTransaction(
-					send_stop(
+					stop_trans(
 						'B', 0.535, order.qty, 0.535, 0.5410, order.sec_code, 0.01
 					)
 				)
 				--message('Sell')
 			elseif bit.band(order.flags,4)==0 then
 				sendTransaction(
-					send_stop(
+					stop_trans(
 						'S', 0.5410, order.qty, 0.5410, 0.535, order.sec_code, 0.01
 					)
 				)
@@ -88,7 +88,7 @@ function OnOrder(order)
 	end
 end
 
-function number_of_items(t)
+function items_in_table(t)
 	if t.sec_code == 'HYDR' and bit.band(t.flags,1)>0 then
 		return true
 	else 
@@ -98,14 +98,14 @@ end
 
 function main()	
     while true do
-		message(tostring(id_of_stop_to_kill('HYDR'))) --раз в секунду выводит текущие дату и время
-		--[[sendTransaction(kill_stop(
-			'HYDR', number_of_stops("HYDR"), id_of_stop_to_kill('HYDR')
-		))]]
-		t1 = SearchItems("stop_orders", 0, getNumberOf("stop_orders")-1, number_of_items)
-
-		sleep(1000)
-		message(tostring(#t1))
+		stop_items = SearchItems("stop_orders", 0, getNumberOf("stop_orders")-1, items_in_table)
+		if stop_items ~= nil and #stop_items>1 then
+			sendTransaction(
+				killstop_trans(
+					'HYDR', quantity_in_stop("HYDR"), id_of_stop_to_kill('HYDR')
+				)
+			)
+		end
 		sleep(10000)
 		
 	end
