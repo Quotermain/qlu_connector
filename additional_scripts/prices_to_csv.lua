@@ -1,12 +1,23 @@
+function split_string(inputstr, sep)
+        if sep == nil then
+                sep = "%s"
+        end
+        local t={}
+        for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+                table.insert(t, str)
+        end
+        return t
+end
+
 function OnInit()
 	function Run(asset, period)
-		--CSV = io.open("C:/Users/Quotermain233/Desktop/VBShared/"..asset.."/"..tostring(period).."_"..asset..".csv", "r")
 		file = "C:/Users/Quotermain233/Desktop/VBShared/"..asset.."/"..tostring(period).."_"..asset..".csv"
 		lines_of_file = {}
 		for line in io.lines(file) do
 			lines_of_file[#lines_of_file + 1] = line
 		end
-		message(tostring(lines_of_file[#lines_of_file]))
+		last_string = lines_of_file[#lines_of_file]
+		message(tostring(split_string(last_string, ',')[3]))
 		sleep(2000)
 	end
 end
