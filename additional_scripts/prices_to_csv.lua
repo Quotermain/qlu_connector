@@ -9,8 +9,12 @@ function split_string(inputstr, sep)
         return t
 end
 
+--Один раз загрузить много свечей по различным таймфреймам для расчета индикаторов
+--Один раз в питоновском скрипте выгрузить свечи в датафрейм
+--В файлы-буфферы (по одному для каждого актива) в цикле подгружать свежие данные по ценам и объему для предсказаний.
+ 
 --file = "C:/Users/Quotermain233/Desktop/VBShared/"..asset.."/"..tostring(period).."_"..asset..".csv"
-file = "C:/Users/Quotermain233/Desktop/VBShared/ALRS/1_ALRS.csv"
+file = "C:/Users/Quotermain233/Desktop/VBShared/ALRS/2_ALRS.csv"
 lines_of_file = {}
 for line in io.lines(file) do
 	lines_of_file[#lines_of_file + 1] = line
