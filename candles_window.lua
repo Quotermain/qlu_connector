@@ -1,31 +1,34 @@
 -- Вызывается терминалом QUIK в момент запуска скрипта
 timeframes = {
-  INTERVAL_TICK, 
+  --INTERVAL_TICK, 
   INTERVAL_M1,
-  INTERVAL_M2,
-  INTERVAL_M3,
-  INTERVAL_M4,
-  INTERVAL_M5,
-  INTERVAL_M6,
-  INTERVAL_M10,
-  INTERVAL_M15,
-  INTERVAL_M20,
-  INTERVAL_M30,
-  INTERVAL_H1,
-  INTERVAL_H2,
-  INTERVAL_H4
+  --INTERVAL_M2,
+  --INTERVAL_M3,
+  --INTERVAL_M4,
+  --INTERVAL_M5,
+  --INTERVAL_M6,
+  --INTERVAL_M10,
+  --INTERVAL_M15,
+  --INTERVAL_M20,
+  --INTERVAL_M30,
+  --INTERVAL_H1,
+  --INTERVAL_H2,
+  --INTERVAL_H4
 }
+
+
+
 function OnInit()
     function DATA(ACTIVE)
-	    
-		for i=1, 14 do
+	    --os.execute("mkdir C:\\Users\\Quotermain233\\Desktop\\VBShared\\test\\"..ACTIVE)
+		for i=1, #timeframes do
 			ds1 = CreateDataSource('TQBR', ACTIVE, timeframes[i])
 			ds1:SetEmptyCallback()
 	
 			-- Создает, или открывает для чтения/добавления файл CSV в той же папке, где находится данный скрипт
-			CSV1 = io.open("C:/Users/Quotermain233/Desktop/VBShared/"..ACTIVE.."/"..timeframes[i].."_"..ACTIVE..".csv", "w+");
+			CSV1 = io.open("C:/Users/Quotermain233/Desktop/VBShared/test/"..ACTIVE.."/"..timeframes[i].."_"..ACTIVE..".csv", "w+");
 
-			num_of_bars_left = 100
+			num_of_bars_left = 500
 			for i = 1, num_of_bars_left do
 				local line = tostring(ds1:T(ds1:Size() - num_of_bars_left + i).year..'-'..
 									ds1:T(ds1:Size() - num_of_bars_left + i).month..'-'..
@@ -72,7 +75,8 @@ function main()
 		DATA("GAZP")
 		DATA("MTSS")
 		DATA("YNDX")
-		message("Done")
+		--message("Done")
+		--break
 	end
 end;
  

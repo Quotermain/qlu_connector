@@ -21,16 +21,17 @@ timeframes = {
 }
 function OnInit()
     function DATA(ACTIVE)
-	    
-		for i=1, 14 do
+		os.execute("mkdir C:\\Users\\Quotermain233\\Desktop\\VBShared\\train\\"..ACTIVE)
+		for i=1, #timeframes do
+		    
 			ds1 = CreateDataSource('TQBR', ACTIVE, timeframes[i])
 			ds1:SetEmptyCallback()
 	
 			-- Создает, или открывает для чтения/добавления файл CSV в той же папке, где находится данный скрипт
-			CSV1 = io.open("C:/Users/Quotermain233/Desktop/VBShared/"..ACTIVE.."/"..timeframes[i].."_"..ACTIVE..".csv", "w+");
+			CSV1 = io.open("C:/Users/Quotermain233/Desktop/VBShared/train/"..ACTIVE.."/"..timeframes[i].."_"..ACTIVE..".csv", "w+");
 
-			num_of_bars_left = 5000
-			for i = 1, num_of_bars_left do
+			num_of_bars_left = 1000
+			for i = 1, (num_of_bars_left) do
 				local line = tostring(ds1:T(ds1:Size() - num_of_bars_left + i).year..'-'..
 									ds1:T(ds1:Size() - num_of_bars_left + i).month..'-'..
 									ds1:T(ds1:Size() - num_of_bars_left + i).day..' '..
@@ -83,7 +84,5 @@ function OnStop()
 	Run = false;
 	-- Закрывает открытый CSV-файл 
 	CSV1:close();	
-	CSV2:close();
-	CSV3:close();
 end;
  
