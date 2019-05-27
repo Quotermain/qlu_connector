@@ -26,7 +26,12 @@ function OnInit()
 			ds1:SetEmptyCallback()
 	
 			-- Создает, или открывает для чтения/добавления файл CSV в той же папке, где находится данный скрипт
-			CSV1 = io.open("C:/Users/Quotermain233/Desktop/VBShared/test/"..ACTIVE.."/"..timeframes[i].."_"..ACTIVE..".csv", "w+");
+			if pcall(io.open("C:/Users/Quotermain233/Desktop/VBShared/test/"..ACTIVE.."/"..timeframes[i].."_"..ACTIVE..".csv", "w+")) then
+				message('oops')
+				break
+			else
+				CSV1 = io.open("C:/Users/Quotermain233/Desktop/VBShared/test/"..ACTIVE.."/"..timeframes[i].."_"..ACTIVE..".csv", "w+");
+			end
 
 			num_of_bars_left = 500
 			for i = 1, num_of_bars_left do
@@ -42,9 +47,13 @@ function OnInit()
 							tostring(ds1:O(ds1:Size() - num_of_bars_left + i))..','..
 							tostring(ds1:C(ds1:Size() - num_of_bars_left + i))..','..
 							tostring(ds1:V(ds1:Size() - num_of_bars_left + i))..'\n'
-				CSV1:write(line)
+				if CSV1 then
+					assert(CSV1:write(line), 'Some shit with file')
+				end
 			end
-			CSV1:flush()
+			if CSV1 then
+				assert(CSV1:flush())
+			end
 		end
 	
 
@@ -85,6 +94,6 @@ function OnStop()
 	-- Выключает флаг, чтобы остановить цикл while внутри main
 	IsRun = false;
 	-- Закрывает открытый CSV-файл 
-	CSV1:close();	
+	assert(CSV1:close());	
 end;
  

@@ -9,8 +9,8 @@ function main ()
 			CSV1:write(line)
 		end
 		CSV1:flush()
-		message('done')
-		sleep(100)
+		--message('done')
+		sleep(300)
 	end
 end
 

@@ -67,7 +67,7 @@ end
 
 --Надо одну стоп заявку. Посылает две.
 function OnOrder(order)
-	if (quantity_in_stop('HYDR')==0 or quantity_in_stop('HYDR')==nil) then
+	if (quantity_in_stop('ALRS')==0 or quantity_in_stop('ALRS')==nil) then
 		if bit.band(order.flags,1)==0 and bit.band(order.flags,2)==0 then
 			if bit.band(order.flags,4)>1 then
 				sendTransaction(
@@ -89,7 +89,7 @@ function OnOrder(order)
 end
 
 function items_in_table(t)
-	if t.sec_code == 'HYDR' and bit.band(t.flags,1)>0 then
+	if t.sec_code == 'ALRS' and bit.band(t.flags,1)>0 then
 		return true
 	else 
 		return false
@@ -149,7 +149,23 @@ function read_from_file(path, sep, tonum, null)
     return csvFile
 end
 
+function getLotSizeBySecCode(ACTIVE)
+   local status = getParamEx("TQBR", ACTIVE, "lotsize"); -- Беру размер лота для кода класса "TQBR"
+   return math.ceil(status.param_value);                   -- Отбрасываю ноли после запятой
+end;
+
 data_path = 'C:/Users/Quotermain233/Desktop/VBShared/test/'
+
+function PRICE_STEP(ACTIVE)
+    t=nil
+	for i=0,getNumberOf("securities")-1 do
+		t=getItem("securities",i)
+			if t.code==ACTIVE then
+				limit=t.min_price_step 
+			end
+	end
+	return limit
+end
 
 function main()	
     while true do
@@ -158,14 +174,19 @@ function main()
 		if stop_items ~= nil and #stop_items>1 then
 			sendTransaction(
 				killstop_trans(
-					'HYDR', quantity_in_stop("HYDR"), id_of_stop_to_kill('HYDR')
+					'ALRS', quantity_in_stop("ALRS"), id_of_stop_to_kill('ALRS')
 				)
 			)
 		end
 		
-		signal = read_from_file(data_path..'/HYDR/signal.csv')
+		signal = read_from_file(data_path..'/ALRS/signal.csv')
+		--os.remove(data_path..'/ALRS/signal.csv')
 		
-		message(tostring(signal[1][3]))
+		lot_size = getLotSizeBySecCode('ALRS')
+		price_step = PRICE_STEP('ALRS')
+
+		message(tostring(tonumber(signal[1][3]) * lot_size))
+		--message(tostring(signal[1][3]))
 		
 		sleep(10000)
 		
