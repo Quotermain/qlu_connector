@@ -1,69 +1,11 @@
-function quantity_in_stop(seccode)
-	local t=nil
-	local stop_number=nil
-	for i=0,getNumberOf("stop_orders")-1 do
-		t=getItem("stop_orders",i)
-		if t.sec_code==seccode and bit.band(t.flags,1)>0 then
-			stop_number=t.qty
-		end
-	end
-	return stop_number
-end
-
-function id_of_stop_to_kill(seccode)
-    local t=nil
-    local kill=nil
-	for i=0,getNumberOf("stop_orders")-1 do
-		t=getItem("stop_orders",i)
-		if t.sec_code==seccode and bit.band(t.flags,1)==0x1 then
-		    kill=t.order_num
-		end
-	end
-    return kill
-end
-
-function killstop_trans(seccode, quantity, stop_order_key)
-    local Transaction = {
-        ACCOUNT="L01-00000F00",
-        CLIENT_CODE="OPEN51085",
-        TRANS_ID=tostring(os.time()),
-        CLASSCODE="TQBR",
-        SECCODE=seccode,
-        ACTION="KILL_STOP_ORDER",
-        TYPE="L",
-        QUANTITY=tostring(quantity),
-        STOP_ORDER_KEY=tostring(stop_order_key),
-        STOP_ORDER_KIND="SIMPLE_STOP_ORDER"
-        }
-	return Transaction
-end
-
-function stop_trans(operation, stopprice, quantity, price, stopprice2, seccode, price_step)
-    local Transaction = {
-        ACCOUNT="L01-00000F00",
-        CLIENT_CODE="OPEN51085",
-        TYPE="L",
-        TRANS_ID=tostring(os.time()),
-        CLASSCODE="TQBR",
-        SECCODE=tostring(seccode),
-        ACTION="NEW_STOP_ORDER",
-        OPERATION=operation,
-        STOPPRICE=tostring(stopprice),
-        QUANTITY=tostring(quantity),
-        PRICE=tostring(price),
-        STOP_ORDER_KIND="TAKE_PROFIT_AND_STOP_LIMIT_ORDER",
-        EXPIRY_DATE="GTC",
-        OFFSET=tostring(price_step),
-        OFFSET_UNITS="PRICE_UNITS",
-        SPREAD=tostring(10*price_step),
-        SPREAD_UNITS="PRICE_UNITS",
-        MARKET_TAKE_PROFIT="NO",
-        STOPPRICE2=tostring(stopprice2),
-        IS_ACTIVE_IN_TIME="NO",
-        MARKET_STOP_LIMIT="NO"
-        }
-    return Transaction
-end
+require 'utils/string_split'
+require 'utils/read_from_file'
+require 'utils/quantity_in_stop'
+require 'utils/id_of_stop_to_kill'
+require 'utils/killstop_trans'
+require 'utils/stop_trans'
+require 'utils/getLotSizeBySecCode'
+require 'utils/PRICE_STEP'
 
 --Надо одну стоп заявку. Посылает две.
 function OnOrder(order)
@@ -88,107 +30,67 @@ function OnOrder(order)
 	end
 end
 
-function items_in_table(t)
-	if t.sec_code == 'ALRS' and bit.band(t.flags,1)>0 then
-		return true
-	else 
-		return false
-	end
-end
-
-function string:split(sSeparator, nMax, bRegexp)
-    if sSeparator == '' then
-        sSeparator = ','
-    end
-
-    if nMax and nMax < 1 then
-        nMax = nil
-    end
-
-    local aRecord = {}
-
-    if self:len() > 0 then
-        local bPlain = not bRegexp
-        nMax = nMax or -1
-
-        local nField, nStart = 1, 1
-        local nFirst,nLast = self:find(sSeparator, nStart, bPlain)
-        while nFirst and nMax ~= 0 do
-            aRecord[nField] = self:sub(nStart, nFirst-1)
-            nField = nField+1
-            nStart = nLast+1
-            nFirst,nLast = self:find(sSeparator, nStart, bPlain)
-            nMax = nMax-1
-        end
-        aRecord[nField] = self:sub(nStart)
-    end
-
-    return aRecord
-end
-
-function read_from_file(path, sep, tonum, null)
-    tonum = tonum or true
-    sep = sep or ','
-    null = null or ''
-    local csvFile = {}
-    local file = assert(io.open(path, "r"))
-    for line in file:lines() do
-        fields = line:split(sep)
-        if tonum then -- convert numeric fields to numbers
-            for i=1,#fields do
-                local field = fields[i]
-                if field == '' then
-                    field = null
-                end
-                fields[i] = tonumber(field) or field
-            end
-        end
-        table.insert(csvFile, fields)
-    end
-    file:close()
-    return csvFile
-end
-
-function getLotSizeBySecCode(ACTIVE)
-   local status = getParamEx("TQBR", ACTIVE, "lotsize"); -- Беру размер лота для кода класса "TQBR"
-   return math.ceil(status.param_value);                   -- Отбрасываю ноли после запятой
-end;
-
 data_path = 'C:/Users/Quotermain233/Desktop/VBShared/test/'
+function run(asset)
 
-function PRICE_STEP(ACTIVE)
-    t=nil
-	for i=0,getNumberOf("securities")-1 do
-		t=getItem("securities",i)
-			if t.code==ACTIVE then
-				limit=t.min_price_step 
-			end
+	stop_items = SearchItems("stop_orders", 0, getNumberOf("stop_orders")-1, items_in_table)
+	if stop_items ~= nil and #stop_items>1 then
+		sendTransaction(
+			killstop_trans(
+				asset, quantity_in_stop(asset), id_of_stop_to_kill(asset)
+			)
+		)
 	end
-	return limit
+		
+	signal = read_from_file(data_path..'/'..asset..'/signal.csv')
+	--os.remove(data_path..'/ALRS/signal.csv')
+		
+	Money=getPortfolioInfoEx('MC0139600000','OPEN51085',2).portfolio_value
+	lot_size = getLotSizeBySecCode(asset)
+	price_step = PRICE_STEP(asset)
+	lots_for_trade = math.ceil(Money * 0.001 / (tonumber(signal[1][3]) * lot_size))
+	dist_to_stop = tonumber(signal[1][3]) - math.fmod(tonumber(signal[1][3]), price_step)
+		
+	stakan=getQuoteLevel2("TQBR",asset)
+	if stakan~=nil then
+		price_to_buy=stakan.offer[1].price
+		price_to_sell=stakan.bid[10].price
+	end
+
+	message(tostring(tonumber(signal[1][3])))
+		
+	sleep(1000)
 end
+
+assets = {
+		"MGNT",
+		"TATN",
+		"SBERP",
+		--"MTLR",
+		"ALRS",
+		"SBER",
+		"MOEX",
+		"HYDR",
+		"ROSN",
+		"LKOH",
+		"SIBN",
+		"GMKN",
+		"RTKM",
+		"SNGS",
+		"SNGSP",
+		"CHMF",
+		--"VTBR",
+		"NVTK",
+		"GAZP",
+		--"MSNG",
+		"MTSS",
+		"YNDX"
+}
 
 function main()	
     while true do
-	
-		stop_items = SearchItems("stop_orders", 0, getNumberOf("stop_orders")-1, items_in_table)
-		if stop_items ~= nil and #stop_items>1 then
-			sendTransaction(
-				killstop_trans(
-					'ALRS', quantity_in_stop("ALRS"), id_of_stop_to_kill('ALRS')
-				)
-			)
+		for i=1, #assets do
+			run(assets[i])
 		end
-		
-		signal = read_from_file(data_path..'/ALRS/signal.csv')
-		--os.remove(data_path..'/ALRS/signal.csv')
-		
-		lot_size = getLotSizeBySecCode('ALRS')
-		price_step = PRICE_STEP('ALRS')
-
-		message(tostring(tonumber(signal[1][3]) * lot_size))
-		--message(tostring(signal[1][3]))
-		
-		sleep(10000)
-		
 	end
 end
