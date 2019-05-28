@@ -79,20 +79,20 @@ function run(asset)
 		if limits < 0 then
 			sendTransaction(
 				stop_trans(
-					'B', price + dist_to_stop, 
+					'B', price - dist_to_profit, 
 					math.abs(limits) / lot_size, 
+					price + 100 * dist_to_stop, 
 					price + dist_to_stop, 
-					price - dist_to_profit, 
 					asset, price_step
 				)
 			)
 		elseif limits > 0 then
 			sendTransaction(
 				stop_trans(
-					'S', price - dist_to_stop, 
+					'S', price + dist_to_profit, 
 					math.abs(limits) / lot_size, 
+					price - 100 * dist_to_stop, 
 					price - dist_to_stop, 
-					price + dist_to_profit, 
 					asset, price_step
 				)
 			)
