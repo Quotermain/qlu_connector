@@ -17,9 +17,9 @@ end
 data_path = 'C:/Users/Quotermain233/Desktop/VBShared/test/'
 
 assets = {
-		"MGNT",
-		"TATN",
-		"SBERP",
+		--"MGNT",
+		--"TATN",
+		--"SBERP",
 		--"MTLR",
 		"ALRS",
 		"SBER",
@@ -70,37 +70,36 @@ function run(asset)
 	lot_size = getLotSizeBySecCode(asset)
 	price_step = PRICE_STEP(asset)
 	lots_for_trade = math.ceil(Money * 0.001 / (tonumber(signal[1][3]) * lot_size))
-	dist_to_stop = tonumber(signal[1][3]) - math.fmod(tonumber(signal[1][3]), price_step)
 	
 	limits, price = depo_limits(asset)
 
-	if limits ~= 0 then
+	if limits ~= 0 and (quantity_in_stop(asset) == 0 or quantity_in_stop(asset) == nil) then
 		dist_to_stop = tonumber(signal[1][3]) - math.fmod(tonumber(signal[1][3]), price_step)
 		dist_to_profit = tonumber(signal[1][2]) - math.fmod(tonumber(signal[1][2]), price_step)
 		if limits < 0 then
 			sendTransaction(
 				stop_trans(
-					'B', price - dist_to_stop, 
-					math.abs(limits) / lot_size, 
-					price - dist_to_stop, 
-					price + dist_to_profit, 
-					asset, price_step
-				)
-			)
-		elseif limits > 0 then
-			sendTransaction(
-				stop_trans(
-					'S', price + dist_to_stop, 
+					'B', price + dist_to_stop, 
 					math.abs(limits) / lot_size, 
 					price + dist_to_stop, 
 					price - dist_to_profit, 
 					asset, price_step
 				)
 			)
+		elseif limits > 0 then
+			sendTransaction(
+				stop_trans(
+					'S', price - dist_to_stop, 
+					math.abs(limits) / lot_size, 
+					price - dist_to_stop, 
+					price + dist_to_profit, 
+					asset, price_step
+				)
+			)
 		end
 	end
-	
-	sleep(1000)
+	--message(tostring(quantity_in_stop(asset)))
+	sleep(100)
 end
 
 function main()	
