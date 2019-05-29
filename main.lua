@@ -7,6 +7,8 @@ require 'utils/stop_trans'
 require 'utils/getLotSizeBySecCode'
 require 'utils/PRICE_STEP'
 require 'utils/depo_limits'
+require 'utils/order_limits'
+require 'utils/trans'
 --[[
 function OnTrade(trade)
 	sleep(2000)
@@ -17,10 +19,10 @@ end
 data_path = 'C:/Users/Quotermain233/Desktop/VBShared/test/'
 
 assets = {
-		--"MGNT",
-		--"TATN",
-		--"SBERP",
-		--"MTLR",
+		"MGNT",
+		"TATN",
+		"SBERP",
+		"MTLR",
 		"ALRS",
 		"SBER",
 		"MOEX",
@@ -51,17 +53,43 @@ function run(asset)
 	if signal then
 	
 		Money=getPortfolioInfoEx('MC0139600000','OPEN51085',2).portfolio_value
+		
 		lot_size = getLotSizeBySecCode(asset)
+		
 		price_step = PRICE_STEP(asset)
-		lots_for_trade = math.ceil(Money * 0.001 / (tonumber(signal[1][3]) * lot_size))
-	
-		limits, price = depo_limits(asset)
-		--[[
+			
+		lots_for_trade = math.floor(Money * 0.0001 / (tonumber(signal[1][3]) * lot_size))
+
 		stakan=getQuoteLevel2("TQBR",asset)
 		if stakan~=nil then
 			price_to_buy=stakan.offer[1].price
 			price_to_sell=stakan.bid[10].price
-		end]]
+		end
+		
+		limits, price = depo_limits(asset)
+		
+		if (limits == 0 or limits == nil) 
+		and (order_limits(asset) == 0 or order_limits(asset)) == nil then
+			if signal[1][1] == 'short' then
+				sendTransaction(
+					trans(
+						asset, 'S', 
+						price_to_sell - 100 * price_step,
+						lots_for_trade
+					)
+				)
+			elseif signal[1][1] == 'long' then
+				sendTransaction(
+					trans(
+						asset, 'B', 
+						price_to_buy + 100 * price_step,
+						lots_for_trade
+					)
+				)			
+			end
+		end
+		
+		limits, price = depo_limits(asset)
 
 		if limits ~= 0 and (quantity_in_stop(asset) == 0 or quantity_in_stop(asset) == nil) then
 			dist_to_stop = tonumber(signal[1][3]) - math.fmod(tonumber(signal[1][3]), price_step)
@@ -88,11 +116,11 @@ function run(asset)
 				)
 			end
 		end
-		--os.remove(data_path..'/ALRS/signal.csv')
-		message(tostring(asset))
+		os.remove(data_path..'/'..asset..'/signal.csv')
+		--message(tostring(lots_for_trade))
 	end
 	
-	sleep(1000)
+	sleep(100)
 end
 
 function main()	

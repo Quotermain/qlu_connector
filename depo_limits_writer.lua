@@ -14,7 +14,7 @@ function main ()
 			CSV1:flush()
 		end
 		--message('done')
-		sleep(300)
+		sleep(500)
 	end
 end
 
