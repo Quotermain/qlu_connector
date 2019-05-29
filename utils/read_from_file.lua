@@ -20,5 +20,7 @@ function read_from_file(path, sep, tonum, null)
 		end
 		file:close()
 		return csvFile
+	else 
+		return nil
 	end
 end

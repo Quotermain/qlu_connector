@@ -47,18 +47,21 @@ assets = {
 assets_limits = {}
 
 function run(asset)
+
+	--message(asset)
 	
 	signal = read_from_file(data_path..'/'..asset..'/signal.csv')
 	
-	if signal then
+	if signal and #signal ~= 0 then
 	
 		Money=getPortfolioInfoEx('MC0139600000','OPEN51085',2).portfolio_value
 		
 		lot_size = getLotSizeBySecCode(asset)
 		
 		price_step = PRICE_STEP(asset)
-			
-		lots_for_trade = math.floor(Money * 0.0001 / (tonumber(signal[1][3]) * lot_size))
+		
+		dist_to_stop = tonumber(signal[1][3])
+		lots_for_trade = math.floor(Money * 0.0001 / (dist_to_stop * lot_size))
 
 		stakan=getQuoteLevel2("TQBR",asset)
 		if stakan~=nil then
@@ -116,12 +119,17 @@ function run(asset)
 				)
 			end
 		end
-		os.remove(data_path..'/'..asset..'/signal.csv')
+		
 		--message(tostring(lots_for_trade))
 	end
-	
+	file_with_signal = data_path..'/'..asset..'/signal.csv'
+	if file_with_signal then
+		os.remove(file_with_signal)
+	end
 	sleep(100)
 end
+
+IsRun = true
 
 function main()	
     while true do
@@ -131,6 +139,12 @@ function main()
 	end
 end
 
+function OnStop()
+	for i=1, #assets do
+		os.remove(data_path..'/'..assets[i]..'/signal.csv')
+	end
+	IsRun = false
+end
 
 
 
