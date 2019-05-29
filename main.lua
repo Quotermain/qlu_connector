@@ -45,61 +45,54 @@ assets = {
 assets_limits = {}
 
 function run(asset)
-
-
-	
-	--message(tostring(quantity_in_stop(asset)))
---[[		
-	
-	--os.remove(data_path..'/ALRS/signal.csv')
-		
-	
-		
-	stakan=getQuoteLevel2("TQBR",asset)
-	if stakan~=nil then
-		price_to_buy=stakan.offer[1].price
-		price_to_sell=stakan.bid[10].price
-	end
-
-	message(tostring(tonumber(signal[1][3])))
-]]
 	
 	signal = read_from_file(data_path..'/'..asset..'/signal.csv')
 	
-	Money=getPortfolioInfoEx('MC0139600000','OPEN51085',2).portfolio_value
-	lot_size = getLotSizeBySecCode(asset)
-	price_step = PRICE_STEP(asset)
-	lots_for_trade = math.ceil(Money * 0.001 / (tonumber(signal[1][3]) * lot_size))
+	if signal then
 	
-	limits, price = depo_limits(asset)
+		Money=getPortfolioInfoEx('MC0139600000','OPEN51085',2).portfolio_value
+		lot_size = getLotSizeBySecCode(asset)
+		price_step = PRICE_STEP(asset)
+		lots_for_trade = math.ceil(Money * 0.001 / (tonumber(signal[1][3]) * lot_size))
+	
+		limits, price = depo_limits(asset)
+		--[[
+		stakan=getQuoteLevel2("TQBR",asset)
+		if stakan~=nil then
+			price_to_buy=stakan.offer[1].price
+			price_to_sell=stakan.bid[10].price
+		end]]
 
-	if limits ~= 0 and (quantity_in_stop(asset) == 0 or quantity_in_stop(asset) == nil) then
-		dist_to_stop = tonumber(signal[1][3]) - math.fmod(tonumber(signal[1][3]), price_step)
-		dist_to_profit = tonumber(signal[1][2]) - math.fmod(tonumber(signal[1][2]), price_step)
-		if limits < 0 then
-			sendTransaction(
-				stop_trans(
-					'B', price - dist_to_profit, 
-					math.abs(limits) / lot_size, 
-					price + 100 * dist_to_stop, 
-					price + dist_to_stop, 
-					asset, price_step
+		if limits ~= 0 and (quantity_in_stop(asset) == 0 or quantity_in_stop(asset) == nil) then
+			dist_to_stop = tonumber(signal[1][3]) - math.fmod(tonumber(signal[1][3]), price_step)
+			dist_to_profit = tonumber(signal[1][2]) - math.fmod(tonumber(signal[1][2]), price_step)
+			if limits < 0 then
+				sendTransaction(
+					stop_trans(
+						'B', price - dist_to_profit, 
+						math.abs(limits) / lot_size, 
+						price + 100 * dist_to_stop, 
+						price + dist_to_stop, 
+						asset, price_step
+					)
 				)
-			)
-		elseif limits > 0 then
-			sendTransaction(
-				stop_trans(
-					'S', price + dist_to_profit, 
-					math.abs(limits) / lot_size, 
-					price - 100 * dist_to_stop, 
-					price - dist_to_stop, 
-					asset, price_step
+			elseif limits > 0 then
+				sendTransaction(
+					stop_trans(
+						'S', price + dist_to_profit, 
+						math.abs(limits) / lot_size, 
+						price - 100 * dist_to_stop, 
+						price - dist_to_stop, 
+						asset, price_step
+					)
 				)
-			)
+			end
 		end
+		--os.remove(data_path..'/ALRS/signal.csv')
+		message(tostring(asset))
 	end
-	--message(tostring(quantity_in_stop(asset)))
-	sleep(100)
+	
+	sleep(1000)
 end
 
 function main()	
