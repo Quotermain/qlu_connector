@@ -50,7 +50,7 @@ function run(asset)
 	
 	signal = read_from_file(data_path..'/'..asset..'/signal.csv')
 	
-	if signal and #signal ~= 0 then
+	if signal and #signal ~= 0 and signal[1][1] and signal[1][2] and signal[1][3] then
 	
 		Money=getPortfolioInfoEx('MC0139600000','OPEN51085',2).portfolio_value
 		
@@ -89,7 +89,7 @@ function run(asset)
 				)			
 			end
 		end
-	sleep(1000)	
+	sleep(2000)	
 	end
 	
 	limits, price = depo_limits(asset)
@@ -119,12 +119,12 @@ function run(asset)
 				)
 			)
 		end
+		file_with_signal = data_path..'/'..asset..'/signal.csv'
+		if file_with_signal then
+			os.remove(file_with_signal)
+		end
 	end
 	
-	file_with_signal = data_path..'/'..asset..'/signal.csv'
-	if file_with_signal then
-		os.remove(file_with_signal)
-	end
 	sleep(100)
 end
 
