@@ -47,8 +47,6 @@ assets = {
 assets_limits = {}
 
 function run(asset)
-
-	--message(asset)
 	
 	signal = read_from_file(data_path..'/'..asset..'/signal.csv')
 	
@@ -91,37 +89,38 @@ function run(asset)
 				)			
 			end
 		end
-		
-		limits, price = depo_limits(asset)
-
-		if limits ~= 0 and (quantity_in_stop(asset) == 0 or quantity_in_stop(asset) == nil) then
-			dist_to_stop = tonumber(signal[1][3]) - math.fmod(tonumber(signal[1][3]), price_step)
-			dist_to_profit = tonumber(signal[1][2]) - math.fmod(tonumber(signal[1][2]), price_step)
-			if limits < 0 then
-				sendTransaction(
-					stop_trans(
-						'B', price - dist_to_profit, 
-						math.abs(limits) / lot_size, 
-						price + 100 * dist_to_stop, 
-						price + dist_to_stop, 
-						asset, price_step
-					)
-				)
-			elseif limits > 0 then
-				sendTransaction(
-					stop_trans(
-						'S', price + dist_to_profit, 
-						math.abs(limits) / lot_size, 
-						price - 100 * dist_to_stop, 
-						price - dist_to_stop, 
-						asset, price_step
-					)
-				)
-			end
-		end
-		
-		--message(tostring(lots_for_trade))
+	sleep(1000)	
 	end
+	
+	limits, price = depo_limits(asset)
+	lot_size = getLotSizeBySecCode(asset)
+	price_step = PRICE_STEP(asset)
+	if limits ~= 0 and (quantity_in_stop(asset) == 0 or quantity_in_stop(asset) == nil) then
+		dist_to_stop = tonumber(signal[1][3]) - math.fmod(tonumber(signal[1][3]), price_step)
+		dist_to_profit = tonumber(signal[1][2]) - math.fmod(tonumber(signal[1][2]), price_step)
+		if limits < 0 then
+			sendTransaction(
+				stop_trans(
+					'B', price - dist_to_profit, 
+					math.abs(limits) / lot_size, 
+					price + 100 * dist_to_stop, 
+					price + dist_to_stop, 
+					asset, price_step
+				)
+			)
+		elseif limits > 0 then
+			sendTransaction(
+				stop_trans(
+					'S', price + dist_to_profit, 
+					math.abs(limits) / lot_size, 
+					price - 100 * dist_to_stop, 
+					price - dist_to_stop, 
+					asset, price_step
+				)
+			)
+		end
+	end
+	
 	file_with_signal = data_path..'/'..asset..'/signal.csv'
 	if file_with_signal then
 		os.remove(file_with_signal)
