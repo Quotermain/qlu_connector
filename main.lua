@@ -103,7 +103,7 @@ function run(asset)
 				stop_trans(
 					'B', price - dist_to_profit, 
 					math.abs(limits) / lot_size, 
-					price + 100 * dist_to_stop, 
+					price + 50 * price_step, 
 					price + dist_to_stop, 
 					asset, price_step
 				)
@@ -113,7 +113,7 @@ function run(asset)
 				stop_trans(
 					'S', price + dist_to_profit, 
 					math.abs(limits) / lot_size, 
-					price - 100 * dist_to_stop, 
+					price - 50 * price_step, 
 					price - dist_to_stop, 
 					asset, price_step
 				)
