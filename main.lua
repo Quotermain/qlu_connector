@@ -95,7 +95,8 @@ function run(asset)
 	limits, price = depo_limits(asset)
 	lot_size = getLotSizeBySecCode(asset)
 	price_step = PRICE_STEP(asset)
-	if limits ~= 0 and (quantity_in_stop(asset) == 0 or quantity_in_stop(asset) == nil) then
+	if signal and limits ~= 0 and (quantity_in_stop(asset) == 0 or quantity_in_stop(asset) == nil) 
+	and #signal ~= 0 and signal[1][1] and signal[1][2] and signal[1][3] then
 		dist_to_stop = tonumber(signal[1][3]) - math.fmod(tonumber(signal[1][3]), price_step)
 		dist_to_profit = tonumber(signal[1][2]) - math.fmod(tonumber(signal[1][2]), price_step)
 		if limits < 0 then
