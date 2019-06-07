@@ -2,6 +2,7 @@ require 'utils/quantity_in_stop'
 require 'utils/id_of_stop_to_kill'
 require 'utils/killstop_trans'
 require 'utils/stop_trans'
+require 'utils/depo_limits'
 
 function run(asset)
 
@@ -14,7 +15,8 @@ function run(asset)
 	end
 	
 	stop_items = SearchItems("stop_orders", 0, getNumberOf("stop_orders")-1, items_in_table)
-	if stop_items ~= nil and #stop_items>1 then
+	price, limits = depo_limits(asset)
+	if stop_items ~= nil and #stop_items>1 or limits == 0 and (stop_items ~= nil or stop_items ~= 0) then
 		sendTransaction(
 			killstop_trans(
 				asset, quantity_in_stop(asset), id_of_stop_to_kill(asset)

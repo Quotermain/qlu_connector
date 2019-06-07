@@ -70,7 +70,7 @@ function run(asset)
 		limits, price = depo_limits(asset)
 		
 		if (limits == 0 or limits == nil) 
-		and (order_limits(asset) == 0 or order_limits(asset)) == nil then
+		and (order_limits(asset) == 0 or order_limits(asset) == nil) then
 			if signal[1][1] == 'short' then
 				sendTransaction(
 					trans(
@@ -89,7 +89,7 @@ function run(asset)
 				)			
 			end
 		end
-	sleep(2000)	
+	sleep(4000)	
 	end
 	
 	limits, price = depo_limits(asset)
@@ -120,10 +120,49 @@ function run(asset)
 				)
 			)
 		end
-		file_with_signal = data_path..'/'..asset..'/signal.csv'
-		if file_with_signal then
-			os.remove(file_with_signal)
+		
+	end
+	
+	if signal and #signal ~= 0 and signal[1][1] and signal[1][2] and signal[1][3] then
+		
+		lot_size = getLotSizeBySecCode(asset)
+		
+		price_step = PRICE_STEP(asset)
+
+		stakan=getQuoteLevel2("TQBR",asset)
+		if stakan~=nil then
+			price_to_buy=stakan.offer[1].price
+			price_to_sell=stakan.bid[10].price
 		end
+		
+		limits, price = depo_limits(asset)
+		
+		if limits > 0 
+		and (order_limits(asset) == 0 or order_limits(asset) == nil) 
+		and (signal[1][1] == 'short' or signal[1][1] == 'nothing') then
+			sendTransaction(
+				trans(
+					asset, 'S', 
+					price_to_sell - 100 * price_step,
+					math.abs(limits) / lot_size
+				)
+			)
+		elseif limits < 0 
+		and (order_limits(asset) == 0 or order_limits(asset) == nil) 
+		and (signal[1][1] == 'long' or signal[1][1] == 'nothing') then
+			sendTransaction(
+				trans(
+					asset, 'B', 
+					price_to_buy + 100 * price_step,
+					math.abs(limits) / lot_size
+				)
+			)			
+		end
+	end
+	
+	file_with_signal = data_path..'/'..asset..'/signal.csv'
+	if file_with_signal then
+		os.remove(file_with_signal)
 	end
 	
 	sleep(100)

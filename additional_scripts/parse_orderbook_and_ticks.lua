@@ -4,8 +4,8 @@ env = luasql.mysql()
 conn = assert(env:connect("trading_data", "Quotermain233", "Quotermain233", "192.168.0.105", 3306))
 
 timeframes = {
-	--INTERVAL_TICK, 
-  INTERVAL_M1,
+	INTERVAL_TICK, 
+  --INTERVAL_M1,
   --INTERVAL_M2,
   --INTERVAL_M3,
   --INTERVAL_M4,
@@ -100,7 +100,8 @@ for i = 1, #assets do
 					bid_count_3 INT,
 					bid_count_2 INT,
 					bid_count_1 INT,
-					close_price FLOAT
+					close FLOAT,
+					volume FLOAT
 				)]], assets[i])
 		)
 	)
@@ -162,7 +163,8 @@ function OnInit()
 							bid_count_3,
 							bid_count_2,
 							bid_count_1,
-							close_price  
+							close,
+							volume
 						)
 						VALUES (
 							'%s', '%s', '%s', '%s', '%s',
@@ -172,7 +174,7 @@ function OnInit()
 							'%s', '%s', '%s', '%s', '%s',
 							'%s', '%s', '%s', '%s', '%s',
 							'%s', '%s', '%s', '%s', '%s',
-							'%s', '%s', '%s', '%s', '%s', '%s' 							
+							'%s', '%s', '%s', '%s', '%s', '%s', '%s'  							
 						)]],
 							ACTIVE,
 							stakan.offer[10].price,
@@ -215,7 +217,8 @@ function OnInit()
 							stakan.bid[13].quantity,
 							stakan.bid[12].quantity,
 							stakan.bid[11].quantity,
-							ds1:C(ds1:Size())
+							ds1:C(ds1:Size()),
+							ds1:V(ds1:Size())
 						)
 				)
 			)
