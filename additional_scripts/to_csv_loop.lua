@@ -30,7 +30,7 @@ function OnInit()
 			-- Создает, или открывает для чтения/добавления файл CSV в той же папке, где находится данный скрипт
 			CSV1 = io.open("C:/Users/Quotermain233/Desktop/VBShared/train/"..ACTIVE.."/"..timeframes[i].."_"..ACTIVE..".csv", "w+");
 
-			num_of_bars_left = 1000
+			num_of_bars_left = 10000
 			for i = 1, (num_of_bars_left) do
 				local line = tostring(ds1:T(ds1:Size() - num_of_bars_left + i).year..'-'..
 									ds1:T(ds1:Size() - num_of_bars_left + i).month..'-'..

@@ -60,6 +60,7 @@ for i = 1, #assets do
 		conn:execute(
 			string.format(
 				[[CREATE TABLE IF NOT EXISTS %s(
+					date_time TEXT,
 					offer_price_10 FLOAT,
 					offer_price_9 FLOAT,
 					offer_price_8 FLOAT,
@@ -123,6 +124,7 @@ function OnInit()
 					string.format(
 						[[INSERT INTO %s 
 						(
+							date_time,
 							offer_price_10,
 							offer_price_9,
 							offer_price_8,
@@ -174,9 +176,18 @@ function OnInit()
 							'%s', '%s', '%s', '%s', '%s',
 							'%s', '%s', '%s', '%s', '%s',
 							'%s', '%s', '%s', '%s', '%s',
-							'%s', '%s', '%s', '%s', '%s', '%s', '%s'  							
+							'%s', '%s', '%s', '%s', '%s', 
+							'%s', '%s', '%s'  							
 						)]],
 							ACTIVE,
+							tostring(
+								ds1:T(ds1:Size()).year..'-'..
+								ds1:T(ds1:Size()).month..'-'..
+								ds1:T(ds1:Size()).day..' '..
+								ds1:T(ds1:Size()).hour..':'..
+								ds1:T(ds1:Size()).min..':'..
+								ds1:T(ds1:Size()).sec
+							),
 							stakan.offer[10].price,
 							stakan.offer[9].price,
 							stakan.offer[8].price,
