@@ -4,20 +4,20 @@ env = luasql.mysql()
 conn = assert(env:connect("trading_data", "Quotermain233", "Quotermain233", "192.168.0.105", 3306))
 
 timeframes = {
-	INTERVAL_TICK, 
-  --INTERVAL_M1,
-  --INTERVAL_M2,
-  --INTERVAL_M3,
-  --INTERVAL_M4,
-  --INTERVAL_M5,
-  --INTERVAL_M6,
-  --INTERVAL_M10,
-  --INTERVAL_M15,
-  --INTERVAL_M20,
-  --INTERVAL_M30,
-  --INTERVAL_H1,
-  --INTERVAL_H2,
-  --INTERVAL_H4
+	--['0_'] = INTERVAL_TICK, 
+	['1_'] = INTERVAL_M1,
+	['2_'] = INTERVAL_M2,
+	['3_'] = INTERVAL_M3,
+	['4_'] = INTERVAL_M4,
+	['5_'] = INTERVAL_M5,
+	['6_'] = INTERVAL_M6,
+	['10_'] = INTERVAL_M10,
+	['15_'] = INTERVAL_M15,
+	['20_'] = INTERVAL_M20,
+	['30_'] = INTERVAL_M30,
+	['60_'] = INTERVAL_H1,
+	['120_'] = INTERVAL_H2,
+	['240_'] = INTERVAL_H4
 }
 
 assets = {
@@ -50,54 +50,39 @@ for i = 1, #assets do
 	res = assert(
 		conn:execute(
 			string.format(
-				[[CREATE TABLE IF NOT EXISTS %s(
-					date_time DATETIME,
-					offer_price_10 FLOAT,
-					offer_price_9 FLOAT,
-					offer_price_8 FLOAT,
-					offer_price_7 FLOAT,
-					offer_price_6 FLOAT,
-					offer_price_5 FLOAT,
-					offer_price_4 FLOAT,
-					offer_price_3 FLOAT,
-					offer_price_2 FLOAT,
-					offer_price_1 FLOAT,
-					bid_price_10 FLOAT,
-					bid_price_9 FLOAT,
-					bid_price_8 FLOAT,
-					bid_price_7 FLOAT,
-					bid_price_6 FLOAT,
-					bid_price_5 FLOAT,
-					bid_price_4 FLOAT,
-					bid_price_3 FLOAT,
-					bid_price_2 FLOAT,
-					bid_price_1 FLOAT,
-					offer_count_10 INT,
-					offer_count_9 INT,
-					offer_count_8 INT,
-					offer_count_7 INT,
-					offer_count_6 INT,
-					offer_count_5 INT,
-					offer_count_4 INT,
-					offer_count_3 INT,
-					offer_count_2 INT,
-					offer_count_1 INT,
-					bid_count_10 INT,
-					bid_count_9 INT,
-					bid_count_8 INT,
-					bid_count_7 INT,
-					bid_count_6 INT,
-					bid_count_5 INT,
-					bid_count_4 INT,
-					bid_count_3 INT,
-					bid_count_2 INT,
-					bid_count_1 INT,
-					close FLOAT,
-					volume FLOAT
-				)]], assets[i])
+				[[DROP TABLE %s_train]], assets[i]
+			)
 		)
 	)
 end
+
+for i = 1, #assets do
+	result_query = "CREATE TABLE IF NOT EXISTS %s_train(date_time DATETIME, "
+	for i = 1, 15 do
+		result_query = result_query..
+			'offer_price_'..tostring(i)..' FLOAT,'..
+			'bid_price_'..tostring(i)..' FLOAT,'..
+			'offer_count_'..tostring(i)..' INT,'..
+			'bid_count_'..tostring(i)..' INT, '
+	end
+	for key, value in pairs(timeframes) do
+		result_query = result_query..
+			key..'open FLOAT, '..
+			key..'high FLOAT, '..
+			key..'low FLOAT, '
+	end
+	result_query = result_query.."close FLOAT, volume FLOAT)"
+	res = assert(
+		conn:execute(
+			string.format(
+				result_query, assets[i]
+			)
+		)
+	)
+end
+
+message('done')
+sleep(10000)
 
 function OnInit()
 
