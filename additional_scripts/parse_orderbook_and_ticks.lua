@@ -45,16 +45,17 @@ assets = {
 		"YNDX"
 }
 
+--[[
 for i = 1, #assets do
 	res = assert(
 		conn:execute(
 			string.format(
-				[[DROP TABLE IF EXISTS %s_train]], assets[i]
+				"DROP TABLE IF EXISTS %s_train", assets[i]
 			)
 		)
 	)
 end
-
+]]
 
 for i = 1, #assets do
 	res = assert(
@@ -435,7 +436,7 @@ function OnInit()
 			)
 
 		end
-	
+	sleep(100)
     end
 	
 end
