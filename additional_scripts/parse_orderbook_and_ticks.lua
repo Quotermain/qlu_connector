@@ -164,65 +164,65 @@ end
 function OnInit()
 
     function DATA(ACTIVE)
+		
+		ds1 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M1)
+		
+		ds2 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M2)
+		
+		ds3 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M3)
+		
+		ds4 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M4)
 	
+		ds5 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M5)
+		
+		ds6 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M6)
+		
+		ds10 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M10)
+		
+		ds15 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M15)
+		
+		ds20 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M20)
+		
+		ds30 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M30)
+		
+		ds60 = CreateDataSource('TQBR', ACTIVE, INTERVAL_H1)
+		
+		ds120 = CreateDataSource('TQBR', ACTIVE, INTERVAL_H2)
+		
+		ds240 = CreateDataSource('TQBR', ACTIVE, INTERVAL_H4)
+		
+		stakan=getQuoteLevel2("TQBR",ACTIVE)
+		
 		for i=1, #timeframes do
-		
-			ds1 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M1)
+			
 			ds1:SetEmptyCallback()
-			sleep(100)
 			
-			ds2 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M2)
 			ds2:SetEmptyCallback()
-			sleep(100)
 			
-			ds3 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M3)
 			ds3:SetEmptyCallback()
-			sleep(100)
 			
-			ds4 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M4)
 			ds4:SetEmptyCallback()
-			sleep(100)
 		
-			ds5 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M5)
 			ds5:SetEmptyCallback()
-			sleep(100)
 			
-			ds6 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M6)
 			ds6:SetEmptyCallback()
-			sleep(100)
 			
-			ds10 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M10)
 			ds10:SetEmptyCallback()
-			sleep(100)
 			
-			ds15 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M15)
 			ds15:SetEmptyCallback()
-			sleep(100)
 			
-			ds20 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M20)
 			ds20:SetEmptyCallback()
-			sleep(100)
-			
-			ds30 = CreateDataSource('TQBR', ACTIVE, INTERVAL_M30)
+
 			ds30:SetEmptyCallback()
-			sleep(100)
 			
-			ds60 = CreateDataSource('TQBR', ACTIVE, INTERVAL_H1)
 			ds60:SetEmptyCallback()
-			sleep(100)
 			
-			ds120 = CreateDataSource('TQBR', ACTIVE, INTERVAL_H2)
 			ds120:SetEmptyCallback()
-			sleep(100)
 			
-			ds240 = CreateDataSource('TQBR', ACTIVE, INTERVAL_H4)
 			ds240:SetEmptyCallback()
-			sleep(100)
 			
 			stakan=getQuoteLevel2("TQBR",ACTIVE)
-			sleep(100)
 			
-		
 			res = assert(
 				conn:execute(
 					string.format(
@@ -449,7 +449,7 @@ function OnInit()
 						)
 				)
 			)
-			--message(tostring(stakan.offer[10].price))
+			--message(tostring(stakan.offer[1].price))
 			sleep(100)
 			
 		end
