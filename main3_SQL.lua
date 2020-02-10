@@ -1,3 +1,6 @@
+--[[
+Imports necessary modules
+]]
 require 'utils/string_split'
 require 'utils/read_from_file'
 require 'utils/quantity_in_stop'
@@ -11,34 +14,44 @@ require 'utils/order_limits'
 require 'utils/trans'
 require "luasql.mysql"
 
+--[[
+Creates connection object and connects to the DB
+]]
 env = luasql.mysql()
 conn = assert(env:connect("trading_data", "Quotermain233", "Quotermain233", "192.168.0.105", 3306))
 
+--[[
+Creates the array of assets to work with
+]]
 assets = {
-		"MGNT",
-		"TATN",
-		"SBERP",
-		"MTLR",
-		"ALRS",
+		--"MGNT",
+		--"TATN",
+		--"SBERP",
+		--"MTLR",
+		--"ALRS",
 		"SBER",
-		"MOEX",
-		"HYDR",
-		"ROSN",
-		"LKOH",
-		"SIBN",
-		"GMKN",
+		--"MOEX",
+		--"HYDR",
+		--"ROSN",
+		--"LKOH",
+		--"SIBN",
+		--"GMKN",
 		--"RTKM",
-		"SNGS",
-		"SNGSP",
-		"CHMF",
+		--"SNGS",
+		--"SNGSP",
+		--"CHMF",
 		--"VTBR",
-		"NVTK",
-		"GAZP",
+		--"NVTK",
+		--"GAZP",
 		--"MSNG",
-		"MTSS",
-		"YNDX"
+		--"MTSS",
+		--"YNDX"
 }
 
+--[[
+Creates a named array with flags_to_close_if_no_stop
+to indicate whether there're stop signals for each asset
+]]
 flags_to_close_if_no_stop = {
 	["MGNT"] = false,
 	["TATN"] = false,
@@ -70,6 +83,10 @@ function run(asset)
 	--message(asset)
 	--sleep(2000)
 	
+	--[[
+	Selects direction of the trade
+	and distances for stop and take_profit
+	]]
 	cur = assert(
 		conn:execute(
 			string.format(
@@ -79,7 +96,11 @@ function run(asset)
 		)
 	)
 	row = cur:fetch({}, 'a')
-
+	
+	--[[
+	Gets cash amount, lot_size, price_step, order_book,
+	current balance and current amount of the asset
+	]]
 	Money=getPortfolioInfoEx('MC0139600000','OPEN51085',2).portfolio_value
 	lot_size = getLotSizeBySecCode(asset)
 	price_step = PRICE_STEP(asset)
@@ -89,9 +110,6 @@ function run(asset)
 		price_to_sell=stakan.bid[10].price
 	end
 	limits, price = depo_limits(asset)
-	
-	--message(tostring(math.floor(Money * 0.0001 / (tonumber(row.dist_to_max) * lot_size))))
-	--sleep(5000)
 	
 	--Opening position
 	if (limits == 0 or limits == nil) 

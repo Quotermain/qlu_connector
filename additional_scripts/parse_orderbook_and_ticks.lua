@@ -450,7 +450,7 @@ function OnInit()
 				)
 			)
 			--message(tostring(stakan.offer[1].price))
-			sleep(100)
+			--sleep(100)
 			
 		end
 	--sleep(2000)
