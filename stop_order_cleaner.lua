@@ -32,7 +32,7 @@ assets = {
 		"MGNT",
 		"TATN",
 		"SBERP",
-		--"MTLR",
+		"MTLR",
 		"ALRS",
 		"SBER",
 		"MOEX",
@@ -45,10 +45,8 @@ assets = {
 		"SNGS",
 		"SNGSP",
 		"CHMF",
-		--"VTBR",
 		"NVTK",
 		"GAZP",
-		--"MSNG",
 		"MTSS",
 		"YNDX"
 }

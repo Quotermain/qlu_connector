@@ -18,7 +18,13 @@ require "luasql.mysql"
 Creates connection object and connects to the DB
 ]]
 env = luasql.mysql()
-conn = assert(env:connect("trading_data", "Quotermain233", "Quotermain233", "192.168.0.105", 3306))
+conn = assert(
+	env:connect(
+		"trading_data", "Quotermain233", 
+		"Quotermain233", "192.168.0.105", 
+		3306
+	)
+)
 
 --[[
 Creates the array of assets to work with
@@ -90,7 +96,8 @@ function run(asset)
 	cur = assert(
 		conn:execute(
 			string.format(
-				[[SELECT * FROM trade_signals WHERE asset = '%s']], 
+				--[[SELECT * FROM trade_signals 
+				WHERE asset = '%s']], 
 				asset
 			)
 		)
@@ -101,7 +108,9 @@ function run(asset)
 	Gets cash amount, lot_size, price_step, order_book,
 	current balance and current amount of the asset
 	]]
-	Money=getPortfolioInfoEx('MC0139600000','OPEN51085',2).portfolio_value
+	Money=getPortfolioInfoEx(
+		'MC0139600000','OPEN51085',2
+	).portfolio_value
 	lot_size = getLotSizeBySecCode(asset)
 	price_step = PRICE_STEP(asset)
 	stakan=getQuoteLevel2("TQBR",asset)
