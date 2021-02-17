@@ -35,9 +35,10 @@ assets = {
 		["VTBR"]=0.003101, --87,
 		["NVTK"]=0.003231, --26,
 		["GAZP"]=0.002355, --20,
-		--"MSNG",
-		--"MTSS",
-		["YNDX"]=0.003546 --5
+		['NLMK']=0.003546, --13
+		["MTSS"]=0.003546, --9
+		["YNDX"]=0.003546, --5
+		['FIVE']=0.003546 --10
 }
 
 
@@ -46,11 +47,13 @@ function run(asset)
 	limits, price = depo_limits(asset)
 	lot_size = getLotSizeBySecCode(asset)
 	price_step = PRICE_STEP(asset)
-	
+
+	message(asset)
+
 	--message(tostring(limits))
-	
+
 	--sleep(5000)
-	
+
 	if limits ~= 0 and (quantity_in_stop(asset) == 0 or quantity_in_stop(asset) == nil) then
 		if limits < 0 then
 			stop_limit_price = price + assets[asset] * price
@@ -59,10 +62,10 @@ function run(asset)
 			take_profit_price = take_profit_price - math.fmod(take_profit_price, price_step)
 			sendTransaction(
 				stop_trans(
-					'B', take_profit_pricet, 
-					math.abs(limits) / lot_size, 
-					stop_limit_price + 10 * price_step, 
-					stop_limit_price, 
+					'B', take_profit_pricet,
+					math.abs(limits) / lot_size,
+					stop_limit_price + 10 * price_step,
+					stop_limit_price,
 					asset, price_step
 				)
 			)
@@ -73,10 +76,10 @@ function run(asset)
 			take_profit_price = take_profit_price - math.fmod(take_profit_price, price_step)
 			sendTransaction(
 				stop_trans(
-					'S', take_profit_price, 
-					math.abs(limits) / lot_size, 
-					stop_limit_price - 10 * price_step, 
-					stop_limit_price, 
+					'S', take_profit_price,
+					math.abs(limits) / lot_size,
+					stop_limit_price - 10 * price_step,
+					stop_limit_price,
 					asset, price_step
 				)
 			)
@@ -84,10 +87,10 @@ function run(asset)
 		sleep(1000)
 	end
 end
-	
+
 IsRun = true
 
-function main()	
+function main()
     while IsRun do
 		for key, value in pairs(assets) do
 			--message(key)
