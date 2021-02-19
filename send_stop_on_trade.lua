@@ -7,6 +7,16 @@ dist_to_stop = {}
 depo_limits = {}
 stop_orders = {}
 
+function OnStopOrder(stops)
+  --[[При получении новой стоп-заявки обновляет таблицу стоп-заявок скрипта]]
+  get_stop_orders()
+end
+
+function OnDepoLimit(depos)
+  --[[При изменении позиций по инструментам обновляет таблицу активов скрипта]]
+  get_depo_limits()
+end
+
 function OnInit()
   --[[Переносим из файла в массив допустимый процент потерь для расчета
   стоп-лосса и тейк-профита]]
@@ -27,7 +37,7 @@ function main()
     в списке стопов]]
     for key, value in pairs(depo_limits) do
       if stop_orders[key] == nil then
-        message(key..' not in stops')
+        message(key..' not in stops'..' '..value['bal'])
       end
     end
 		sleep(10000)
