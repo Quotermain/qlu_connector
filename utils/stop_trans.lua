@@ -1,4 +1,6 @@
-function stop_trans(operation, stopprice, quantity, price, stopprice2, seccode, price_step)
+function stop_trans(
+  operation, stopprice, quantity, price, stopprice2, seccode, price_step
+)
     local Transaction = {
         ACCOUNT="L01-00000F00",
         CLIENT_CODE="OPEN51085",

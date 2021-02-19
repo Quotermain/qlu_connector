@@ -15,8 +15,10 @@ function get_depo_limits()
       asset_info = getSecurityInfo(class, ticker)
       price_step = tonumber(asset_info.min_price_step)
       lot_size = tonumber(asset_info.lot_size)
+      position_price = tonumber(asset.wa_position_price)
       depo_limits[ticker] = {
-        ['bal']=bal, ['price_step']=price_step, ['lot_size']=lot_size
+        ['bal']=bal, ['price_step']=price_step, ['lot_size']=lot_size,
+        ['position_price']=position_price
       }
     end
   end

@@ -40,7 +40,8 @@ function main()
         message(
           key..' not in stops. Balance: '..tostring(value['bal'])..
           '. Price step: '..tostring(value['price_step'])..'. Lot size: '..
-          tostring(value['lot_size'])
+          tostring(value['lot_size'])..'. Position price: '..
+          tostring(value['position_price'])
         )
       end
     end
