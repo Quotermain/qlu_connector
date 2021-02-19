@@ -9,11 +9,13 @@ depo_limits = {}
 stop_orders = {}
 
 function OnStopOrder(stops)
+  stop_orders = {}
   --[[При получении новой стоп-заявки обновляет таблицу стоп-заявок скрипта]]
   get_stop_orders()
 end
 
 function OnDepoLimit(depos)
+  depo_limits = {}
   --[[При изменении позиций по инструментам обновляет таблицу активов скрипта]]
   get_depo_limits()
 end
@@ -61,10 +63,10 @@ function main()
     			sendTransaction(
     				stop_trans(
     					'B', take_profit_pricet,
-    					math.abs(limits) / lot_size,
-    					stop_limit_price + 10 * price_step,
+    					math.abs(value['bal']) / value['lot_size'],
+    					stop_limit_price + 10 * value['price_step'],
     					stop_limit_price,
-    					asset, price_step
+    					key, value['price_step']
     				)
     			)
         elseif value['bal'] > 0 then
@@ -83,16 +85,18 @@ function main()
           sendTransaction(
     				stop_trans(
     					'S', take_profit_price,
-    					math.abs(limits) / lot_size,
-    					stop_limit_price - 10 * price_step,
+    					math.abs(value['bal']) / value['lot_size'],
+    					stop_limit_price - 10 * value['price_step'],
     					stop_limit_price,
-    					asset, price_step
+    					key, value['price_step']
     				)
     			)
         end
 
       end
     end
+
+    --get_stop_orders()
 		sleep(10000)
 	end
 end
