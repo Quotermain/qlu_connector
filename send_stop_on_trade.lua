@@ -1,4 +1,4 @@
-require 'get_distances_to_stop'
+require 'utils/get_distances_to_stop'
 require 'utils/get_depo_limits'
 require 'utils/get_stop_orders'
 require 'utils/string_split'
@@ -37,7 +37,11 @@ function main()
     в списке стопов]]
     for key, value in pairs(depo_limits) do
       if stop_orders[key] == nil then
-        message(key..' not in stops'..' '..value['bal'])
+        message(
+          key..' not in stops. Balance: '..tostring(value['bal'])..
+          '. Price step: '..tostring(value['price_step'])..'. Lot size: '..
+          tostring(value['lot_size'])
+        )
       end
     end
 		sleep(10000)
